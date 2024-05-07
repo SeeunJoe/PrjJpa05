@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+  <h2 style="color:red" data-id="4" data-a="없는 글자" >Hell로 월드</h2>
+  <p>큰 글자를 클릭하면 배경색이 노란색이 됩니다</p>
+  
+  <script type="text/javascript">
+  
+//   	const h2El = document.querySelector('h2')
+//   	console.dir(h2El)
+//   	console.log(h2El)
+//   	alert(h2El.dataset.a)
+  	
+//  	const h2El = document.getElementsByTagName('h2')
+		const h2Els = document.querySelectorAll('h2')
+  	console.dir(h2Els[0])
+  	console.log(h2Els[0])
+  	h2Els.forEach((h2El) => {
+  		h2El.onclick = function(){
+//  			const el = event.target // event.target = this
+//  			console.dir(event)
+//  			alert(el.innerHTML)
+				alert(this.innerHTML) // this == 클릭한 h2
+//				this.style.background-color = "yellow"  오류문장
+				this.style.backgroundColor = "yellow"
+				this.style['background-color'] = "yellow"
+  		}
+  	})
+  	/*
+  	for(let i=0; i< h2Els.length; i++){
+  		h2El[i].addEventListener('click',function(){
+  			alert(h2Els[i].innerHTML)
+  		})
+  	}
+  	*/
+  	
+  </script>
+</body>
+</html>

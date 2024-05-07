@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+  table {width:80%; margin:0 auto;}
+  table, th, td {
+     border:1px solid #ccc;
+  }
+  td { padding: 10px; text-align: center; }
+  tr { background-color:''}
+  tr:hover:not(tr:first-child) { background-color:yellow}
+  tr:first-child  {
+     background : #000;
+     color      : #FFF;
+  }
+</style>
+</head>
+<body>
+  <h2>Articles API tester</h2>
+  <fieldset>
+  <label>아이디</label>
+  <input type="number" id="id" value="1" /> <br> 
+  <label>제목</label>
+  <input type="text"   id="title"  /> <br> 
+  <label>내용</label>
+  <textarea id="content" rows="3"></textarea><br> 
+  </fieldset>
+  <div id="output"></div>
+  <ul>
+    <li><a id="get" href="/api/articles">Article 목록 조회(get)</a></li>
+    <li><a id="getOne" href="/api/articles">한개의 Article 조회(get)</a></li>
+    <li><a id="post" href="/api/articles">새글 추가(post)</a></li>
+    <li><a id="patch" href="/api/articles">글 수정(patch)</a></li>
+    <li><a id="delete" href="/api/articles">글 삭제(delete)</a></li>
+    <li>&nbsp;</li>
+    <li><a id="transact1" href="/api/transaction-test">트랜잭션 테스트(오류3개저장됨)</a></li>
+    <li><a id="transact2" href="/api/transaction-test2">트랜잭션 테스트(하나도 저장되지 않음)</a></li>
+  </ul>
+  
+  <script>
+    const outputEl = document.querySelector('#output')
+    const aElList  = document.querySelectorAll('a')
+    aElList.forEach( (aEl, i) => {
+	    aEl.onclick = ( e ) => {
+            e.preventDefault(); // 기존 a tag 기능을 무력화
+			//alert(aEl.id);
+            
+            let id      = null;
+            let title   = null;
+            let content = null;
+            let params  = null;
+            switch( aEl.id  ) {
+            case "get":
+        	    fetch(aEl.href)  // == fetch(aEl.href, { method:'GET'})
+	             .then( response => response.json() )
+	             .then( articleList => {
+	                 console.dir(articleList)
+	                 let html  = JSON.stringify( articleList ) + "<br>"
+	                 html += "<table>"
+	                 html += "<tr><td>아이디</td><td>제목</td><td>내용</td></tr>"
+	                 articleList.forEach(( article ) =>{
+	                      html  += "<tr>"
+	                      html  += "<td>" + article.id      + "</td>"
+	                      html  += "<td>" + article.title   + "</td>"
+	                      html  += "<td>" + article.content + "</td>"
+	                      html  += "</tr>"
+					 })
+	                 html += "</table>"
+	                 outputEl.innerHTML = html;	                 
+	             } )
+	             .catch( error   => console.dir(error));
+	            break;  
+	            
+            case "getOne":
+                const numId = document.querySelector('#id').value; 
+                
+	            fetch(aEl.href + "/" + numId )
+	             .then( response => response.json() )  // json = JSON.parse()
+	             .then( json     => {
+	                 console.dir(json)
+	                 outputEl.innerHTML = JSON.stringify( json );
+	                 document.querySelector('#id').value      = json.id;
+	                 document.querySelector('#title').value   = json.title;
+	                 document.querySelector('#content').value = json.content;
+	             } )
+	             .catch( error   => console.dir(error));
+	            break;
+	            
+            case "post":           
+            	id       = document.querySelector('#id').value
+            	title    = document.querySelector('#title').value
+            	content  = document.querySelector('#content').value
+                params = {
+            		method: "POST",
+            		headers : {
+            			   "Accept"       : "application/json",
+                 		   "Content-Type" : "application/json",                                                                                                
+                 		   "Access-Control-Origin": "*"     // CORS 정책을 피한다
+                 	},
+            		body: JSON.stringify({
+                        id      :  id,  
+            		    title   :  title,
+            		    content :  content,
+            		}),
+                }
+	         //   fetch(aEl.href, new URLSearchParams( params ) )
+	            fetch(aEl.href,  params  )
+	             .then( response => response.json() )
+	             .then( json     => {
+	                 console.dir(json)
+	                 outputEl.innerHTML = JSON.stringify( json );
+	             } )
+	             .catch( error   => { 
+	                 console.dir( error )                     
+                     alert("!!! 저장실패 !!!" )
+				 } );
+	            break;
+	            
+            case "patch":           
+            	id       = document.querySelector('#id').value
+            	title    = document.querySelector('#title').value
+            	content  = document.querySelector('#content').value
+                params = {
+            		method: "PATCH",
+            		headers : {
+            			   "Accept"       : "application/json",
+                 		   "Content-Type" : "application/json",                                                                                                
+                 		   "Access-Control-Origin": "*"     // CORS 정책을 피한다
+                 	},
+            		body: JSON.stringify({
+                        id      :  id,  
+            		    title   :  title,
+            		    content :  content,
+            		}),
+                }
+	         //   fetch(aEl.href, new URLSearchParams( params ) )
+	            fetch(aEl.href + "/" + id,  params  )
+	             .then( response => response.json() )
+	             .then( json     => {
+	                 console.dir(json)
+	                 outputEl.innerHTML = JSON.stringify( json );
+	             } )
+	             .catch( error   => console.dir(error));
+	            break;
+	            
+            case "delete":           
+            	id       = document.querySelector('#id').value            	
+                params = {
+            		method: "DELETE",
+            		headers : {
+            			   "Accept"       : "application/json",
+                 		   "Content-Type" : "application/json",                                                                                                
+                 		   "Access-Control-Origin": "*"     // CORS 정책을 피한다
+                 	},
+            		body: JSON.stringify({
+                        id      :  id
+            		}),
+                }
+	         //   fetch(aEl.href, new URLSearchParams( params ) )
+	            fetch(aEl.href + "/" + id,  params  )
+	             .then( response => {
+                    switch( response.status ) {
+                    case 204: 
+                    	alert( id + '가 삭제되었습니다'); 
+                    	fetch(aEl.href)  // == fetch(aEl.href, { method:'GET'})
+        	             .then( response => response.json() )
+        	             .then( articleList => {
+        	                 console.dir(articleList)
+        	                 let html  = JSON.stringify( articleList ) + "<br>"
+        	                 html += "<table>"
+        	                 html += "<tr><td>아이디</td><td>제목</td><td>내용</td></tr>"
+        	                 articleList.forEach(( article ) =>{
+        	                      html  += "<tr>"
+        	                      html  += "<td>" + article.id      + "</td>"
+        	                      html  += "<td>" + article.title   + "</td>"
+        	                      html  += "<td>" + article.content + "</td>"
+        	                      html  += "</tr>"
+        					 })
+        	                 html += "</table>"
+        	                 outputEl.innerHTML = html;	                 
+        	             } )
+        	             .catch( error   => console.dir(error));
+                    	break;
+                    case 400: 
+                    	alert('삭제되지 않았습니다'); 
+                    	break;
+                    }  
+                 } )
+	            break;
+	        
+            // 실행화면 500 에러 발생하면서 3ㅐ긔 data가 전부 입력된다
+            //  tarancscation 작동하지 않음
+            case "transact1":
+                params = {
+            		method: "POST",
+            		headers : {
+            			   "Accept"       : "application/json",
+                 		   "Content-Type" : "application/json",                                                                                                
+                 		   "Access-Control-Origin": "*"     // CORS 정책을 피한다
+                 	},
+            		body: JSON.stringify([
+            			 { title :"시간 예약",   content : "1240"},
+            			 { title :"테이블 지정", content : "A12"},
+            			 { title :"메뉴 선택",   content : "Branch A"}            			
+            		]),
+                }
+	         //   fetch(aEl.href, new URLSearchParams( params ) )
+	            fetch('/api/transaction-test',  params  )
+	             .then( response => response.json() )
+	             .then( json     => {
+	                 console.dir(json)
+	                 outputEl.innerHTML = JSON.stringify( json );
+	             } )
+	             .catch( error   => { 
+	                 console.dir( error )                     
+                     alert("!!! 저장실패 !!!" )
+				 } );
+	            break;
+	            
+            // 실행화면 500 에러 발생하면서 3개 data가 입력되려한다
+            //  오류발생시 tarancscation 작동 - 데이터 3개 다 롤백됨
+            // @Transactional 애노테이션이 있으면 
+            case "transact2":
+                params = {
+            		method: "POST",
+            		headers : {
+            			   "Accept"       : "application/json",
+                 		   "Content-Type" : "application/json",                                                                                                
+                 		   "Access-Control-Origin": "*"     // CORS 정책을 피한다
+                 	},
+            		body: JSON.stringify([
+            			 { title :"시간 예약",   content : "1240"},
+            			 { title :"테이블 지정", content : "A12"},
+            			 { title :"메뉴 선택",   content : "Branch A"}            			
+            		]),
+                }
+	         //   fetch(aEl.href, new URLSearchParams( params ) )
+	            fetch('/api/transaction-test2',  params  )
+	             .then( response => response.json() )
+	             .then( json     => {
+	                 console.dir(json)
+	                 outputEl.innerHTML = JSON.stringify( json );
+	             } )
+	             .catch( error   => { 
+	                 console.dir( error )                     
+                     alert("!!! 저장실패 !!!" )
+				 } );
+	            break;
+	            
+            	
+            } // switch end
+            
+	    }
+    })  // forEach end
+    
+    /* 동적으로 생성된 요소에 이벤트 바인딩 
+      https://babycoder05.tistory.com/entry/JS-%EB%8F%99%EC%A0%81%EC%9C%BC%EB%A1%9C-%EC%83%9D%EC%84%B1%EB%90%9C-%EC%9A%94%EC%86%8C%EC%97%90-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%B0%94%EC%9D%B8%EB%94%A9
+      createElement로 요소를 생성하지 않고 직접 html을 작성해서 innerHTML이나
+      jQuery의 append()와 같은 방법으로 요소를 동적으로 생성할 경우에는 
+      이벤트 바인딩이 되지 않는다.    
+      이런 경우에는 동적으로 생성된 요소의 부모 요소 중 동적으로 생성되지 
+      않은 요소에 이벤트를 바인딩 하면 된다. 
+    */
+    let pNode = document.querySelector('#output')
+    pNode.addEventListener('click', (e) => {
+         console.dir(e);
+         const tds   = e.target.parentElement.children;
+         let id      = tds[0].innerHTML;
+         let title   = tds[1].innerHTML;
+         let content = tds[2].innerHTML;
+        // alert(id + ',' + title + ','  + content)
+         document.querySelector('#id').value       = id;
+         document.querySelector('#title').value    = title;
+         document.querySelector('#content').value  = content;
+    })
+    
+  
+  </script>
+</body>
+
+
+
+
+
+</html>

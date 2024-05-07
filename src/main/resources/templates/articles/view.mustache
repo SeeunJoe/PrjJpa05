@@ -1,0 +1,58 @@
+{{>layouts/header}}
+ 
+<!-- 부트스트랩 table 참고 https://getbootstrap.kr/docs/5.1/content/tables/ -->
+<!-- 머스태치 문법 : https://bibi6666667.tistory.com/269 -->
+ <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Title</th>
+      <th scope="col">Content</th>      
+    </tr>
+  </thead>
+  <tbody>
+    {{! 주석입니다 }}
+    {{! #article }}
+    <tr>
+      <th scope="row">{{ article.id }}</th>
+      <td>{{ article.title }}</td>
+      <td>{{ article.content }}</td>     
+    </tr>   
+    {{! /article}}
+  </tbody>
+</table>
+
+<div class="mx-auto" style="width:80%">
+	<a href="/articles/List"            class="btn btn-sm btn-primary" style="width:100px">목록</a>   
+	<a href="/articles/WriteForm"       class="btn btn-sm btn-secondary" style="width:100px">새 글쓰기</a>   
+	<a href="/articles/{{id}}/EditForm" class="btn btn-sm btn-warning" style="width:100px">수정</a>   
+	<a href="/articles/{{id}}/Delete"   class="btn btn-sm btn-danger" style="width:100px">삭제</a> 
+</div>
+	<!-- 댓글 뷰 화면 추가 -->  
+	
+	{{>comments/_comments}}
+      
+{{>layouts/footer}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
